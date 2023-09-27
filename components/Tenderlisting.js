@@ -144,7 +144,7 @@ const Tenderlisting = (props) => {
               alignItems: "center",
             }}
           >
-            {props.pending ? (
+            {props.pending == 0 ? (
               <MaterialIcons
                 name="pending-actions"
                 size={24}

@@ -17,6 +17,8 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DrawerContent from "../components/DrawerContent";
+import CompanyDetails from "./CompanyDetails";
+import Login from "./Login";
 
 const Drawer = createDrawerNavigator();
 
@@ -56,14 +58,26 @@ export class MyDrawer extends Component {
             <Image
               style={{
                 width: "40%",
-                marginEnd: 25,
-                height: "40%",
+                height: "30%",
+                margin: 150,
+                marginEnd: 20,
               }}
               source={require("../assets/wordlogo.png")}
             />
           ),
         }}
       >
+        <Drawer.Screen
+          name="Login"
+          component={Login}
+          options={{
+            headerShown: false,
+            title: "Home",
+            drawerIcon: ({ color, size }) => (
+              <Entypo name="Login" color={color} size={20} />
+            ),
+          }}
+        />
         <Drawer.Screen
           name="Home"
           component={Home}
@@ -102,6 +116,7 @@ export class MyDrawer extends Component {
             ),
           }}
         />
+        <Drawer.Screen name="Details" component={CompanyDetails} />
       </Drawer.Navigator>
     );
   }

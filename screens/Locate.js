@@ -1,5 +1,13 @@
-import { StyleSheet, Text, View, TextInput } from "react-native";
-import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  RefreshControl,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import colors from "../assets/Theme.js/colors";
 import { TouchableOpacity } from "react-native";
 
@@ -17,13 +25,53 @@ import Tenderlisting from "../components/Tenderlisting";
 import CompanyListing from "../components/CompanyListing";
 const Locate = () => {
   const [searchText, setSearchText] = useState("");
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleFilterData = (text) => {
     setSearchText(text);
+    const filtered = data.filter(
+      (item) =>
+        item.name.toLowerCase().includes(text.toLowerCase()) ||
+        item.address.toLowerCase().includes(text.toLowerCase()) ||
+        item.description.toLowerCase().includes(text.toLowerCase()) ||
+        item.city.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredData(filtered);
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        "https://www.pezabond.com/kondwani/fetchAllCollectors.php"
+      );
+      const data = await response.json();
+      setData(data);
+      setFilteredData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
   const onClearInput = () => {
     setSearchText(""); // Clear the input text
+    setFilteredData(data); // Reset the filtered data to show all items
   };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -54,21 +102,36 @@ const Locate = () => {
       </View>
       <Text style={{ marginTop: 2 }}>Results: </Text>
       <View style={{ marginTop: 20, paddingTop: 10 }}>
-        <CompanyListing
-          name="Kondwa Garbage Collectors"
-          address="Ndola, plot 45"
-          contact="+2603435655"
-          email="company1@email.com"
-          price={35}
-        />
-
-        <CompanyListing
-          name="Kondwa Garbage Collectors"
-          address="Ndola, plot 45"
-          contact="+26021187676"
-          email="company3@email.com"
-          price={45}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : (
+          <FlatList
+            data={filteredData}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View>
+                <CompanyListing
+                  id={item.id}
+                  name={item.name}
+                  address={item.address}
+                  contact={item.contact}
+                  email={item.email}
+                  min_per_week={item.min_per_week}
+                  city={item.city}
+                  description={item.description}
+                />
+              </View>
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]} // Customize the loading indicator color
+                tintColor={colors.primary} // Customize the loading indicator color
+              />
+            }
+          />
+        )}
       </View>
     </View>
   );

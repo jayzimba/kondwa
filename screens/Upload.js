@@ -31,6 +31,7 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { JumpingTransition } from "react-native-reanimated";
 import * as ImageManipulator from "expo-image-manipulator";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Location from "expo-location";
 
 const SquareView = ({ item, onPress, isPressed }) => {
   const backgroundColor = isPressed ? colors.secondary : colors.light; // Change the color when pressed
@@ -51,6 +52,22 @@ const SquareView = ({ item, onPress, isPressed }) => {
 
 const Upload = () => {
   const refRBSheet = useRef();
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords); // Store latitude and longitude in state
+    })();
+  }, []);
 
   const [selectedCity, setSelectedCity] = useState(null);
   const [street, setStreet] = useState("");
@@ -74,7 +91,15 @@ const Upload = () => {
       setShowDatePicker(false); // Close the picker on Android if canceled
     }
   };
-  const formattedDate = date.toDateString(); // Convert the Date object to a formatted string
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Add leading zero if needed
+    const day = String(date.getDate()).padStart(2, "0"); // Add leading zero if needed
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatedDate = formatDate(date);
 
   useEffect(() => {
     (async () => {
@@ -94,6 +119,7 @@ const Upload = () => {
 
     if (!result.canceled && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
+      console.log(imageUri);
     }
   };
 
@@ -112,61 +138,68 @@ const Upload = () => {
 
   const handleRequest = async () => {
     setRequested(true);
-    // Create a FormData object to send the data and image
-    const formData = new FormData();
+    var formData = new FormData();
+
     formData.append("city", selectedCity);
     formData.append("street", street);
     formData.append("houseNumber", houseNumber);
-    formData.append("date", date);
+    formData.append("date", formatedDate);
     formData.append("phoneNumber", phoneNumber);
     formData.append("email", email);
     formData.append("garbageType", pressedItem);
-    formData.append("isLocationSend", isLocationSend ? "1" : "0"); // Convert boolean to 1 or 0
+    formData.append("isLocationSend", isLocationSend ? 1 : 0); // Convert boolean to 1 or 0
+    formData.append("latitude", location.latitude);
+    formData.append("longitude", location.longitude);
 
-    try {
-      const response = await fetch(
-        "https://www.pezabond.com/kondwani/request.php",
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            "Content-Type": "form-data",
-          },
-        }
+    var requestOptions = {
+      method: "POST",
+      body: formData,
+      redirect: "follow",
+    };
+
+    if (
+      pressedItem == null ||
+      selectedCity == null ||
+      street == null ||
+      houseNumber == null ||
+      phoneNumber == null
+    ) {
+      Alert.alert(
+        "Missing Fields",
+        "Complete the form to process your request"
       );
-
-      if (response.ok) {
-        // Request was successful, handle the response if needed
-        const responseData = await response.json();
-        Alert.alert(
-          "Requested Submitted",
-          "your registered garbage collection company will ccontact you to verify details"
-        );
-        setRequested(false);
-        setSelectedCity(null);
-        setStreet(null);
-        setDate(null);
-        setEmail(null);
-        setPhoneNumber(null);
-        setHouseNumber(null);
-        setIsLocationSend(false);
-        console.log("Response from server:", responseData);
-      } else {
-        // Request failed, handle the error
-        console.error("Request failed:", response.status);
-      }
-    } catch (error) {
-      // Handle any network or other errors here
-      console.error("Error:", error);
-    } finally {
-      setRequested(false);
-      refRBSheet.current.close();
       setImageUri(null);
+      refRBSheet.current.close();
+      setRequested(false);
+    } else {
+      fetch("https://www.pezabond.com/kondwani/request.php", requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success == true) {
+            Alert.alert(
+              "Pick Up Request Submitted",
+              "your registered garbage collection company will ccontact you to verify details"
+            );
+            setRequested(false);
+            setSelectedCity(null);
+            setStreet(null);
+            setEmail(null);
+            setPhoneNumber(null);
+            setHouseNumber(null);
+            setIsLocationSend(false);
+            refRBSheet.current.close();
+            console.log("inserted");
+          } else {
+            console.log("failed");
+          }
+        })
+        .catch((error) => console.log("error", error))
+        .finally(() => setRequested(false));
     }
   };
 
   const placeholder = {
-    label: "Select your city...",
+    label: "* Select your city...",
     value: null,
     color: colors.gray,
   };
@@ -232,7 +265,7 @@ const Upload = () => {
               />
             </View>
             <TextInput
-              label="Street"
+              label={<Text style={{ color: colors.lightgray }}>* Street</Text>}
               value={street}
               onChangeText={(text) => setStreet(text)}
               style={styles.input}
@@ -244,7 +277,9 @@ const Upload = () => {
               }}
             />
             <TextInput
-              label="House Number"
+              label={
+                <Text style={{ color: colors.lightgray }}>* House number</Text>
+              }
               value={houseNumber}
               onChangeText={(text) => setHouseNumber(text)}
               style={styles.input}
@@ -258,7 +293,7 @@ const Upload = () => {
             <TouchableOpacity onPress={() => setShowDatePicker(true)}>
               <TextInput
                 label="Date of Pick-up"
-                value={formattedDate}
+                value={formatedDate}
                 onChangeText={(text) => setDate(text)}
                 style={styles.input}
                 theme={{
@@ -271,10 +306,13 @@ const Upload = () => {
               />
             </TouchableOpacity>
             <TextInput
-              label="Phone Number"
+              label={
+                <Text style={{ color: colors.lightgray }}>* Phone number</Text>
+              }
               value={phoneNumber}
               onChangeText={(text) => setPhoneNumber(text)}
               style={styles.input}
+              keyboardType="numeric"
               theme={{
                 colors: {
                   primary: colors.primary,
@@ -293,17 +331,37 @@ const Upload = () => {
                   underlineColor: "transparent",
                 },
               }}
+              keyboardType="email-address"
             />
-            <View style={styles.switchContainer}>
-              <Text style={styles.switchLabel}>
-                Use your Current Location as pickup point
-              </Text>
-              <Switch
-                value={isLocationSend}
-                onValueChange={(value) => setIsLocationSend(value)}
-                trackColor={{ false: "#767577", true: colors.primary }}
-                thumbColor={isLocationSend ? "#f4f3f4" : "#f4f3f4"}
-              />
+
+            <View>
+              {errorMsg ? (
+                <Text>{errorMsg}</Text>
+              ) : location ? (
+                <View style={styles.switchContainer}>
+                  <Text style={styles.switchLabel}>
+                    Use Current Location as pickup point
+                  </Text>
+                  <Switch
+                    value={isLocationSend}
+                    onValueChange={(value) => {
+                      if (value == true) {
+                        Alert.alert(
+                          "Share location",
+                          "Your location coords will be sent to the garbage collection"
+                        );
+                        setIsLocationSend(value);
+                      } else {
+                        setIsLocationSend(value);
+                      }
+                    }}
+                    trackColor={{ false: "#767577", true: colors.primary }}
+                    thumbColor={isLocationSend ? "#f4f3f4" : "#f4f3f4"}
+                  />
+                </View>
+              ) : (
+                <Text>Fetching location...</Text>
+              )}
             </View>
 
             <Button
@@ -327,7 +385,7 @@ const Upload = () => {
 
             <RBSheet
               ref={refRBSheet}
-              height={Dimensions.get("window").height * 0.7}
+              height={Dimensions.get("window").height * 0.65}
               closeOnDragDown={true}
               closeOnPressMask={true}
               customStyles={{
@@ -343,7 +401,7 @@ const Upload = () => {
                 },
               }}
             >
-              <View style={{ padding: 15 }}>
+              <View style={{ padding: 7 }}>
                 <View style={{ alignItems: "center" }}>
                   <Text
                     style={[

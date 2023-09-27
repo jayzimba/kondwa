@@ -18,8 +18,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../assets/Theme.js/colors";
+import { useSelector } from "react-redux";
 
 const DrawerContent = (props) => {
+  const customer = useSelector((state) => state.customer);
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <DrawerContentScrollView {...props}>
@@ -33,14 +36,6 @@ const DrawerContent = (props) => {
               }}
             >
               <Avatar.Image source={require("../assets/logo2.png")} size={70} />
-              <View style={{ flexDirection: "column", marginLeft: 15 }}>
-                <Text style={styles.title}>{"name"}</Text>
-                <Text style={styles.caption}>
-                  260{"-"}
-                  {"phone_number"}
-                </Text>
-                <Text style={styles.caption2}>{"email"}</Text>
-              </View>
             </View>
           </View>
 

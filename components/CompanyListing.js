@@ -1,12 +1,28 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import colors from "../assets/Theme.js/colors";
 import { Caption } from "react-native-paper";
 import { ImageBackground } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const CompanyListing = (props) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() =>
+        navigation.navigate("Details", {
+          id: props.id,
+          name: props.name,
+          address: props.address,
+          contact: props.contact,
+          email: props.email,
+          min_per_week: props.min_per_week,
+          city: props.city,
+          description: props.description,
+        })
+      }
+    >
       <ImageBackground
         source={require("../assets/logo2.png")}
         resizeMethod="resize"
@@ -23,10 +39,11 @@ const CompanyListing = (props) => {
         <Text style={styles.contact}>{props.email}</Text>
         <Caption style={styles.contact}>{props.contact}</Caption>
         <Text>
-          Minimum Per Week: <Text style={styles.amount}>K{props.price}</Text>
+          Minimum Per Week:{" "}
+          <Text style={styles.amount}>K{props.min_per_week}</Text>
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

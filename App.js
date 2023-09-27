@@ -20,15 +20,19 @@ import Home from "./screens/Home";
 import Upload from "./screens/Upload";
 import { Image } from "react-native";
 import { PaperProvider } from "react-native-paper";
+import { Provider } from "react-redux";
+import store from "./Redux/store";
 
 export default function App() {
   return (
-    <PaperProvider>
+  <Provider  store={store}>
+      <PaperProvider>
       <NavigationContainer independent={true} style={styles.container}>
         <StatusBar style="dark-content" />
         <MyDrawer />
       </NavigationContainer>
     </PaperProvider>
+  </Provider>
   );
 }
 
