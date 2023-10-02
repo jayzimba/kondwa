@@ -24,14 +24,15 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false,
-      isSuccessful: false,
       phone: "",
       password: "",
+      activityLoader: false,
       incorrectCredentials: false,
+      isLoading: false, // Track login loading state
       userData: null, // Store user data upon successful login
       otp: "",
       enteredOtp: "",
+      isLoggedIn: false,
       customer: [],
     };
   }
@@ -68,36 +69,35 @@ class Login extends Component {
       fetch("https://www.pezabond.com/kondwani/login.php", requestOptions)
         .then((Response) => Response.json())
         .then((result) => {
-          if (result[0] == "log in Failed!") {
-            this.setState({ customer: [] });
+          if (result != "log in Failed!") {
             this.setState((prevState) => ({
-              isLoading: false, // Toggle the state
-              incorrectCredentials: true,
-            }));
-            console.log("incorrect password");
-          } else {
-            this.setState((prevState) => ({
-              isLoading: true, // Toggle the state
+              activityLoader: true, // Toggle the state
               incorrectCredentials: false,
             }));
             this.setState({ customer: result });
 
             this.setState((prevState) => ({
-              isLoading: false, // Toggle the state
+              activityLoader: false, // Toggle the state
             }));
-            this.setState({ isSuccessful: true });
+            this.setState({ isLoggedIn: true });
             this.setCustomerData(result);
-            this.props.navigation.navigate("Home");
+            this.props.navigation.replace("Home");
+          } else {
+            this.setState({ customer: [] });
+            this.setState((prevState) => ({
+              activityLoader: false, // Toggle the state
+              incorrectCredentials: true,
+            }));
           }
         })
         .catch((error) => {
-          console.error("ERROR:" + error);
+          console.log(error);
+          this.setState({ activityLoader: false, incorrectCredentials: true });
         })
         .finally(() =>
           this.setState({
             phone: "",
             password: "",
-            isLoading: false, // Toggle the state
           })
         );
     }
@@ -110,13 +110,15 @@ class Login extends Component {
       alert("password field can't be empty");
     } else {
       this.setState((prevState) => ({
-        isLoading: true, // Toggle the state
+        activityLoader: true, // Toggle the state
       }));
       this.LogDataInDB();
     }
   };
 
   render() {
+    const { navigation } = this.props;
+
     return (
       <>
         <StatusBar style="auto" />
@@ -183,6 +185,7 @@ class Login extends Component {
                       placeholder="Enter your mobile number"
                       fontSize={16}
                       maxLength={9}
+                      value={this.state.phone}
                       selectionColor={colors.primary}
                       marginHorizontal={10}
                       returnKeyType="done"
@@ -208,7 +211,8 @@ class Login extends Component {
                       placeholder="Password"
                       fontSize={16}
                       marginHorizontal={10}
-                      maxLength={8}
+                      maxLength={12}
+                      value={this.state.password}
                       returnKeyType="done"
                       autoCapitalize="none"
                       keyboardType="default"
@@ -232,10 +236,22 @@ class Login extends Component {
                   >
                     <TouchableOpacity
                       style={styles.signInBtn}
-                      disabled={this.state.isLoading}
-                      onPress={this.setActivityLoader}
+                      disabled={this.state.activityLoader}
+                      onPress={
+                        this.setActivityLoader
+                        //   () => {
+                        //   this.setActivityLoader;
+                        //   if (this.state.phone.trim() == "") {
+                        //     alert("phone number field is empty");
+                        //   } else if (this.state.password.trim() == "") {
+                        //     alert("password field can't be empty");
+                        //   } else {
+                        //     navigation.navigate("OTP", { phoneData: this.state.phone });
+                        //   }
+                        // }
+                      }
                     >
-                      {this.state.isLoading == true ? (
+                      {this.state.activityLoader ? (
                         <ActivityIndicator color="white" />
                       ) : (
                         <Text
@@ -259,7 +275,7 @@ class Login extends Component {
                   >
                     <TouchableOpacity
                       style={styles.toSignUp}
-                      onPress={() => this.props.navigation.navigate("Sign up")}
+                      onPress={() => navigation.navigate("Signup")}
                     >
                       <Text
                         style={{

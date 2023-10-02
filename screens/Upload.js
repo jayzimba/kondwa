@@ -32,6 +32,7 @@ import { JumpingTransition } from "react-native-reanimated";
 import * as ImageManipulator from "expo-image-manipulator";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Location from "expo-location";
+import { useSelector } from "react-redux";
 
 const SquareView = ({ item, onPress, isPressed }) => {
   const backgroundColor = isPressed ? colors.secondary : colors.light; // Change the color when pressed
@@ -52,31 +53,36 @@ const SquareView = ({ item, onPress, isPressed }) => {
 
 const Upload = () => {
   const refRBSheet = useRef();
+  const customer = useSelector((state) => state.customer);
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [customerID, setCustomerID] = useState(customer[0].id);
+  const [companyID, setCompanyID] = useState(customer[0].companyID);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      setLocation(location.coords); // Store latitude and longitude in state
-    })();
+    fetchLocation();
   }, []);
 
+  const fetchLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({});
+    setLocation(location.coords); // Store latitude and longitude in state
+  };
+
   const [selectedCity, setSelectedCity] = useState(null);
-  const [street, setStreet] = useState("");
+  const [street, setStreet] = useState(customer[0].street);
   const [houseNumber, setHouseNumber] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(customer[0].phone);
+  const [email, setEmail] = useState(customer[0].email);
   const [isLocationSend, setIsLocationSend] = useState(false); // State for the switch
   const [request, setRequested] = useState(false); // State for the switch
   const [imageUri, setImageUri] = useState(null);
@@ -137,8 +143,12 @@ const Upload = () => {
   };
 
   const handleRequest = async () => {
+   
     setRequested(true);
     var formData = new FormData();
+
+    var lat = location.latitude == null ? 0 : location.latitude;
+    var lon = location.longitude == null ? 0 : location.longitude;
 
     formData.append("city", selectedCity);
     formData.append("street", street);
@@ -148,8 +158,9 @@ const Upload = () => {
     formData.append("email", email);
     formData.append("garbageType", pressedItem);
     formData.append("isLocationSend", isLocationSend ? 1 : 0); // Convert boolean to 1 or 0
-    formData.append("latitude", location.latitude);
-    formData.append("longitude", location.longitude);
+    formData.append("customerID", customerID);
+    formData.append("latitude", lat);
+    formData.append("longitude", lon);
 
     var requestOptions = {
       method: "POST",
@@ -182,13 +193,9 @@ const Upload = () => {
             );
             setRequested(false);
             setSelectedCity(null);
-            setStreet(null);
-            setEmail(null);
-            setPhoneNumber(null);
             setHouseNumber(null);
             setIsLocationSend(false);
             refRBSheet.current.close();
-            console.log("inserted");
           } else {
             console.log("failed");
           }
@@ -360,7 +367,28 @@ const Upload = () => {
                   />
                 </View>
               ) : (
-                <Text>Fetching location...</Text>
+                <View>
+                  <Text>Fetching location...</Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: colors.lightgray,
+                      padding: 5,
+                      borderRadius: 5,
+                      width: "40%",
+                    }}
+                    onPress={fetchLocation}
+                  >
+                    <Text
+                      style={{
+                        color: colors.white,
+                        padding: 3,
+                        borderRadius: 5,
+                      }}
+                    >
+                      Clicke To reload
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </View>
 

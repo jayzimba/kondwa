@@ -34,7 +34,7 @@ const Tenderlisting = (props) => {
         shadowOpacity: 0.3,
         shadowRadius: 4,
         marginHorizontal: 5,
-        marginVertical: 2,
+        marginVertical: 5,
         padding: 5,
         paddingBottom: 1,
         flexDirection: "row",
@@ -145,13 +145,23 @@ const Tenderlisting = (props) => {
             }}
           >
             {props.pending == 0 ? (
-              <MaterialIcons
-                name="pending-actions"
-                size={24}
-                color={colors.secondary}
-              />
+              <>
+                <MaterialIcons
+                  name="pending-actions"
+                  size={24}
+                  color={colors.secondary}
+                />
+                <Text>Pending</Text>
+              </>
             ) : (
-              <Feather name="check-circle" size={24} color={colors.secondary} />
+              <>
+                <Feather
+                  name="check-circle"
+                  size={24}
+                  color={colors.secondary}
+                />
+                <Text>Collected</Text>
+              </>
             )}
           </View>
         </View>

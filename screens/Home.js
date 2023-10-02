@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import colors from "../assets/Theme.js/colors";
 import Lottie from "lottie-react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
@@ -9,6 +9,8 @@ import Icon from "react-native-vector-icons/FontAwesome"; // Import an icon libr
 
 import KondwaGreen from "../components/KondwaGreen";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { Alert } from "react-native";
 
 const dataArray = [
   { text: "Plastic", iconName: "trash" },
@@ -30,6 +32,22 @@ const SquareView = ({ item }) => {
 
 const Home = () => {
   const navigation = useNavigation();
+  const customer = useSelector((state) => state.customer);
+  const [companyID, setCompanyID] = useState(customer[0].companyID);
+
+  const checKSubscription = () => {
+    if (companyID == null) {
+      Alert.alert(
+        "YOU HAVE NO SUBSCRIPTION",
+        "Subscribe with a garbage collection company to start requesting for garbage collection."
+      );
+      navigation.navigate("Locate");
+      console.log("you are not registered under any company");
+    } else {
+      navigation.navigate("Upload");
+      console.log("you are registered under company with id " + companyID);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <View
@@ -94,7 +112,7 @@ const Home = () => {
             flexDirection: "row",
             marginTop: 20,
           }}
-          onPress={() => navigation.navigate("Upload")}
+          onPress={checKSubscription}
         >
           <Text style={{ color: colors.white }}>Request Collection</Text>
           <MaterialIcons name="keyboard-arrow-right" size={24} color="white" />

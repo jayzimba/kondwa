@@ -101,13 +101,13 @@ const Locate = () => {
         </View>
       </View>
       <Text style={{ marginTop: 2 }}>Results: </Text>
-      <View style={{ marginTop: 20, paddingTop: 10 }}>
         {loading ? (
           <ActivityIndicator size="large" color={colors.primary} />
         ) : (
           <FlatList
             data={filteredData}
             keyExtractor={(item) => item.id.toString()}
+            horizontal={false}
             renderItem={({ item }) => (
               <View>
                 <CompanyListing
@@ -132,7 +132,6 @@ const Locate = () => {
             }
           />
         )}
-      </View>
     </View>
   );
 };

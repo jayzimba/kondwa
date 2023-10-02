@@ -14,6 +14,7 @@ const Tenders = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetched, setFetched] = useState(false);
   const customer = useSelector((state) => state.customer);
 
   useEffect(() => {
@@ -38,10 +39,15 @@ const Tenders = () => {
       const data = await response.json();
       setData(data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      setData([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
+      if (data.length <= 0) {
+        setFetched(false);
+      } else {
+        setFetched(true);
+      }
     }
   };
 
@@ -51,34 +57,56 @@ const Tenders = () => {
 
   return (
     <View style={styles.container}>
+      <View
+        style={{
+          marginBottom: 20,
+          backgroundColor: colors.secondary,
+          borderRadius: 5,
+        }}
+      >
+        <Text style={{ padding: 5, color: colors.white }}>
+          <Text style={{ fontWeight: "bold" }}>Results: </Text> {data.length}
+        </Text>
+      </View>
+
+      {data.length == 0 ? (
+        <View>
+          <Text>You have no requests</Text>
+          <Text>Pull Down to refresh</Text>
+        </View>
+      ) : null}
       {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View>
-              <Tenderlisting
-                street={item.street}
-                houseNumber={item.houseNumber}
-                city={item.city}
-                type={item.garbageType}
-                date={item.date}
-                pending={parseInt(item.status)}
-              />
-            </View>
-          )}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[colors.primary]} // Customize the loading indicator color
-              tintColor={colors.primary} // Customize the loading indicator color
+        <View
+          style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : null}
+
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View>
+            <Tenderlisting
+              street={item.street}
+              houseNumber={item.houseNumber}
+              city={item.city}
+              type={item.garbageType}
+              date={item.date}
+              pending={parseInt(item.status)}
             />
-          }
-        />
-      )}
+          </View>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors.primary]} // Customize the loading indicator color
+            tintColor={colors.primary} // Customize the loading indicator color
+          />
+        }
+      />
     </View>
   );
 };

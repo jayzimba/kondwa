@@ -19,7 +19,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DrawerContent from "../components/DrawerContent";
 import CompanyDetails from "./CompanyDetails";
 import Login from "./Login";
-
+import { useSelector } from "react-redux";
 const Drawer = createDrawerNavigator();
 
 export class MyDrawer extends Component {
@@ -67,17 +67,6 @@ export class MyDrawer extends Component {
           ),
         }}
       >
-        <Drawer.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerShown: false,
-            title: "Home",
-            drawerIcon: ({ color, size }) => (
-              <Entypo name="Login" color={color} size={20} />
-            ),
-          }}
-        />
         <Drawer.Screen
           name="Home"
           component={Home}

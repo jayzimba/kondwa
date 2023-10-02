@@ -36,6 +36,10 @@ const DrawerContent = (props) => {
               }}
             >
               <Avatar.Image source={require("../assets/logo2.png")} size={70} />
+              <View style={{ marginStart: 10 }}>
+                <Text style={{ color: "white" }}>{customer[0].name}</Text>
+                <Text style={{ color: "white" }}>{customer[0].email}</Text>
+              </View>
             </View>
           </View>
 
@@ -101,6 +105,15 @@ const DrawerContent = (props) => {
           </Drawer.Section>
         </View>
       </DrawerContentScrollView>
+      <Drawer.Section style={styles.bottomDrawerSection}>
+        <DrawerItem
+          icon={(color, size) => (
+            <Icon name="exit-to-app" color={color} size={22} />
+          )}
+          label="Sign Out"
+          onPress={() => console.log("logging out")}
+        />
+      </Drawer.Section>
     </View>
   );
 };
