@@ -220,8 +220,8 @@ const CompanyDetails = (props) => {
               tx_ref: generateTransactionRef(10),
               authorization: "FLWPUBK-aa9cc71e514393d4bfc408610089dcf2-X",
               customer: {
-                email: "jayzimba40@gmail.com",
-                phone_number: "0963676321",
+                email: "kondwa940@gmail.com",
+                phone_number: "0964360071",
                 name: "geoffrey zimba",
               },
               amount: parseFloat(min_per_week),
