@@ -25,6 +25,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
 import HomeRedirector from "./screens/HomeRedirector";
+import Admin from "./screens/Admin";
+import CompanyProfile from "./screens/CompanyProfile";
+import Customers from "./screens/Customers";
+import Map from "./screens/Map";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +46,10 @@ export default function App() {
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Signup" component={Signup} />
             <Stack.Screen name="Home" component={HomeRedirector} />
+            <Stack.Screen name="Dashboard" component={Admin} />
+            <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
+            <Stack.Screen name="Customer" component={Customers} />
+            <Stack.Screen name="Orders" component={Map} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

@@ -297,6 +297,23 @@ class Login extends Component {
           <Text style={{ marginTop: 30, color: colors.lightgray }}>
             Version 1.0
           </Text>
+
+          <TouchableOpacity
+            style={styles.toSignUp}
+            onPress={() => navigation.navigate("Dashboard")}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#000",
+                fontWeight: "500",
+                textDecorationLine: "underline",
+                paddingBottom: 10,
+              }}
+            >
+              Admin Login
+            </Text>
+          </TouchableOpacity>
         </ImageBackground>
       </>
     );

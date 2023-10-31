@@ -274,7 +274,7 @@ const Upload = () => {
             <TextInput
               label={<Text style={{ color: colors.lightgray }}>* Street</Text>}
               value={street}
-              onChangeText={(text) => setStreet(text)}
+               
               style={styles.input}
               theme={{
                 colors: {
