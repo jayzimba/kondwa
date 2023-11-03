@@ -18,9 +18,12 @@ import {
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../assets/Theme.js/colors";
+import { useRoute } from "@react-navigation/native";
 
 const Orders = (props) => {
   const navigation = useNavigation();
+
+
   return (
     <View
       style={{
@@ -73,7 +76,7 @@ const Orders = (props) => {
               marginBottom: 10,
             }}
           >
-            ADH Garbage collectors
+            Collection Request
           </Text>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialIcons name="house" size={18} color="#000" />
@@ -149,6 +152,12 @@ const Orders = (props) => {
                 padding: 3,
                 borderRadius: 20,
               }}
+              onPress={() =>
+                navigation.navigate("ViewRequests", {
+                  lat: props.lat,
+                  long: props.long,
+                })
+              }
             >
               <FontAwesome
                 name="map-marker"

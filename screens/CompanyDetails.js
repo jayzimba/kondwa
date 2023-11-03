@@ -1,13 +1,10 @@
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import colors from "../assets/Theme.js/colors";
-import { ImageBackground } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native";
-import { useSelector } from "react-redux";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { PayWithFlutterwave } from "flutterwave-react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, Alert, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
+import colors from "../assets/Theme.js/colors";
 
 interface RedirectParams {
   status: "successful" | "cancelled";

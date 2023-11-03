@@ -24,7 +24,7 @@ const Map = () => {
 
   const fetchData = async () => {
     var formdata = new FormData();
-    formdata.append("customerID", 11);
+    formdata.append("customerID", 16);
 
     var requestOptions = {
       method: "POST",
@@ -96,6 +96,8 @@ const Map = () => {
               type={item.garbageType}
               date={item.date}
               pending={parseInt(item.status)}
+              lat={parseFloat(item.latitude)}
+              long={parseFloat(item.longitude)}
             />
           </View>
         )}

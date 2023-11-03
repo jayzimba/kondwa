@@ -29,6 +29,7 @@ import Admin from "./screens/Admin";
 import CompanyProfile from "./screens/CompanyProfile";
 import Customers from "./screens/Customers";
 import Map from "./screens/Map";
+import ViewRequests from './screens/ViewRequest';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ export default function App() {
             <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
             <Stack.Screen name="Customer" component={Customers} />
             <Stack.Screen name="Orders" component={Map} />
+            <Stack.Screen name="ViewRequests" component={ViewRequests} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
