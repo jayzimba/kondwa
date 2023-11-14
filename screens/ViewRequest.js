@@ -6,6 +6,7 @@ import * as Location from "expo-location";
 import { FontAwesome } from "@expo/vector-icons";
 import MapViewDirections from "react-native-maps-directions";
 import { useRoute } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 const ViewRequests = ({ navigation }) => {
   const [location, setLocation] = useState(null);
@@ -46,9 +47,22 @@ const ViewRequests = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="arrow-back-circle-sharp"
+            size={24}
+            color="black"
+            style={{
+              padding: 40,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
       {location ? (
         <MapView
           ref={mapRef}
+          provider="google"
           style={{ flex: 1 }}
           initialRegion={{
             latitude: location.coords.latitude,
@@ -75,22 +89,6 @@ const ViewRequests = ({ navigation }) => {
             description="You are here"
             // image={require("../../../assets/patient.png")}
           />
-          {/* {markers.map((marker) => (
-            <Marker
-              key={marker.id}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              title={`Ambulance: ${marker.name}`}
-              description="Ambulance"
-              onPress={() => {
-                handleMarkerPress(marker);
-              }}
-              // Replace the image path with your custom marker icon
-              //   image={require("../../../assets/ambulance.png")}
-            />
-          ))} */}
 
           {location && (
             <>
